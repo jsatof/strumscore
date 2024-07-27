@@ -16,7 +16,7 @@ MainComponent::MainComponent() {
 
 void MainComponent::populateLines(std::vector<juce::Line<float>> &line_list) {
 	const float margin = 48;
-	juce::Point<float> staff_dim = { getWidth() - 2 * margin, 150 };
+	juce::Point<float> staff_dim = { getWidth() - margin, 150 };
 
 	juce::Rectangle<float> staff_border = { margin, margin, staff_dim.getX(), staff_dim.getY() };
 

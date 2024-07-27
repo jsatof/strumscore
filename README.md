@@ -1,7 +1,7 @@
 # Strumscore
 
 ## Building
-Run the following to compile the project provided you have a C++23 supported compiler (I use gnu14.1), ninja, and cmake.
+Run the following to compile the project provided you need JUCE, a C++23 supported compiler (mainly g++ 14.1, 11.4), ninja, and cmake.
 ```bash
 mkdir build
 cd build

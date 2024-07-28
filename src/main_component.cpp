@@ -1,6 +1,14 @@
 #include <main_component.h>
 
-MainComponent::MainComponent() : string_count(6) {
+#include <fmt/core.h>
+
+namespace fs = std::filesystem;
+
+MainComponent::MainComponent()
+	: string_count(6)
+	, config_path(fs::temp_directory_path()/"strumscore_document.xml") // TODO: this document for testing, come up with more proper design
+	, document(juce::File{juce::String{config_path.string()}}) // TODO: eww
+{
     setSize(1200, 900);
 
 	// TODO: add menu items to menuModel
@@ -8,13 +16,76 @@ MainComponent::MainComponent() : string_count(6) {
 	//menuBar.setModel(menuModel);
 
 	// TODO: style menubar
-    addAndMakeVisible(menuBar);
+    addAndMakeVisible(menu_bar);
+
+    validateDirectories();
 
     populateLines();
+    populateDrawables();
 }
 
-void MainComponent::appendWithStroke(juce::Line<float> a_line, float a_stroke) {
+void MainComponent::validateDirectories() {
+	if (!fs::exists(config_path)) {
+		fmt::print(stderr, "WARNING: config path doesnt exist. Creating new default config.\n");
+	}
+
+	fs::path resource_path = fs::current_path()/"res";
+	if (!fs::exists(resource_path)) {
+		fmt::print(stderr, "ERROR: Resource path not found. Make sure program launched from root project directory.\n");
+		return;
+	}
+
+	std::vector<std::string> valid_resources = {
+		"Music0.svg",
+		"Music10.svg",
+		"Music11.svg",
+		"Music12.svg",
+		"Music13.svg",
+		"Music14.svg",
+		"Music16.svg",
+		"Music17.svg",
+		"Music18.svg",
+		"Music1.svg",
+		"Music2.svg",
+		"Music3.svg",
+		"Music4.svg",
+		"Music5.svg",
+		"Music6.svg",
+		"Music7.svg",
+		"Music8.svg",
+		"Music9.svg",
+	};
+
+	for (auto const &dir_entry : fs::directory_iterator{resource_path}) {
+		auto found_iter = std::find(valid_resources.begin(), valid_resources.end(), dir_entry.path().filename().string());
+		if (found_iter != valid_resources.end()) {
+			valid_resources.erase(found_iter);
+		}
+	}
+
+	for (auto const &s : valid_resources) {
+		fmt::print(stderr, "ERROR: Could not find the resource: {}\n", s);
+	}
+}
+
+void MainComponent::appendLineWithStroke(juce::Line<float> a_line, float a_stroke) {
 	lines.push_back({ a_line, a_stroke });
+}
+
+void MainComponent::populateDrawables() {
+	drawables.reserve(100); // TODO: tune this value
+
+	fs::path res_path = fs::current_path()/"res";
+	if (fs::exists(res_path)) {
+		for (auto const &dir_entry : fs::directory_iterator{res_path}) {
+			if (dir_entry.path().extension().string() == std::string{".svg"}) {
+				fmt::print("FOUND SVG: {}\n", dir_entry.path().string());
+				juce::File svg_file = { dir_entry.path().string() };
+				std::unique_ptr<juce::XmlElement> parsed_svg = juce::XmlDocument::parse(svg_file);
+				drawables.push_back(juce::Drawable::createFromSVG(*parsed_svg));
+			}
+		}
+	}
 }
 
 void MainComponent::populateLines() {
@@ -22,21 +93,22 @@ void MainComponent::populateLines() {
 
 	juce::Rectangle<float> staff_border = { margin, margin, getWidth() - 2 * margin, 150 };
 
-	lines.reserve(100);
+	lines.reserve(100); // TODO: tune this value
 	// bad potentially - this performs two copies and two destructions, but runs on load so eh?
-	appendWithStroke(juce::Line<float>{ staff_border.getTopLeft(), staff_border.getTopRight() });
-	appendWithStroke(juce::Line<float>{ staff_border.getTopLeft(), staff_border.getBottomLeft() });
-	appendWithStroke(juce::Line<float>{ staff_border.getBottomLeft(), staff_border.getBottomRight() });
-	appendWithStroke(juce::Line<float>{ staff_border.getTopRight(), staff_border.getBottomRight() });
+	appendLineWithStroke(juce::Line<float>{ staff_border.getTopLeft(), staff_border.getTopRight() });
+	appendLineWithStroke(juce::Line<float>{ staff_border.getTopLeft(), staff_border.getBottomLeft() });
+	appendLineWithStroke(juce::Line<float>{ staff_border.getBottomLeft(), staff_border.getBottomRight() });
+	appendLineWithStroke(juce::Line<float>{ staff_border.getTopRight(), staff_border.getBottomRight() });
 
 	// big stroke on beginning of first measure in a chart, and one at the end
-	appendWithStroke(juce::Line<float>{ staff_border.getTopLeft(), staff_border.getBottomLeft() }, 15.f);
-	appendWithStroke(juce::Line<float>{ staff_border.getTopRight(), staff_border.getBottomRight() }, 15.f);
+	appendLineWithStroke(juce::Line<float>{ staff_border.getTopLeft(), staff_border.getBottomLeft() }, 15.f);
+	appendLineWithStroke(juce::Line<float>{ staff_border.getTopRight(), staff_border.getBottomRight() }, 15.f);
 
 	for (int i = 1; i < string_count; ++i) {
 		float sub_line_y = (staff_border.getHeight() / string_count) * i + staff_border.getY();
-		appendWithStroke(juce::Line<float>{ staff_border.getX(), sub_line_y, staff_border.getRight(), sub_line_y });
+		appendLineWithStroke(juce::Line<float>{ staff_border.getX(), sub_line_y, staff_border.getRight(), sub_line_y });
 	}
+
 }
 
 void MainComponent::paint(juce::Graphics& g) {
@@ -47,9 +119,13 @@ void MainComponent::paint(juce::Graphics& g) {
 		auto [line, stroke] = line_pair;
 		g.drawLine(line, stroke);
 	}
+
+	for (auto &svg_image : drawables) {
+		svg_image->draw(g, 1.f, {});
+	}
 }
 
 void MainComponent::resized() {
-	menuBar.setBounds(0, 0, getWidth(), 24);
+	menu_bar.setBounds(0, 0, getWidth(), 24);
 
 }

@@ -12,6 +12,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -Wall -Wpedantic -We
 #set(THIRD_PARTY_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
 #include(cmake/dependencies.cmake)
 find_package(JUCE CONFIG REQUIRED)
+find_package(fmt REQUIRED)
 find_package(GTest REQUIRED)
 
 add_subdirectory(src)

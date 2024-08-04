@@ -13,6 +13,7 @@ public:
 private:
 	void populateLines();
 	void populateDrawables();
+	std::unique_ptr<juce::Drawable> loadDrawable(const std::filesystem::path &p);
 	void validateDirectories();
 	void appendLineWithStroke(juce::Line<float> a_line, float stroke = 0.5f);
 

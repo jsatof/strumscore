@@ -77,16 +77,24 @@ void MainComponent::populateDrawables() {
 
 	fs::path res_path = fs::current_path()/"res";
 	if (fs::exists(res_path)) {
-		for (auto const &dir_entry : fs::directory_iterator{res_path}) {
-			if (dir_entry.path().extension().string() == std::string{".svg"}) {
-				fmt::print("FOUND SVG: {}\n", dir_entry.path().string());
-				juce::File svg_file = { dir_entry.path().string() };
-				std::unique_ptr<juce::XmlElement> parsed_svg = juce::XmlDocument::parse(svg_file);
-				drawables.push_back(juce::Drawable::createFromSVG(*parsed_svg));
-			}
-		}
+		// TODO: detect time signatures in document
+		std::unique_ptr<juce::Drawable> beat_count_time_sig = loadDrawable(res_path/"Music4.svg");
+		std::unique_ptr<juce::Drawable> beat_length_time_sig = loadDrawable(res_path/"Music4.svg");
+
+		drawables.emplace_back(std::move(beat_count_time_sig));
+		drawables.emplace_back(std::move(beat_length_time_sig));
+
+	} else {
+		fmt::print(stderr, "ERROR: Cannot locate resource directory\n");
 	}
 }
+
+std::unique_ptr<juce::Drawable> MainComponent::loadDrawable(const fs::path &p) {
+	juce::File svg_file = { p.string() };
+	std::unique_ptr<juce::XmlElement> parsed_svg = juce::XmlDocument::parse(svg_file);
+	return juce::Drawable::createFromSVG(*parsed_svg);
+}
+
 
 void MainComponent::populateLines() {
 	const float margin = 48;
@@ -108,21 +116,19 @@ void MainComponent::populateLines() {
 		float sub_line_y = (staff_border.getHeight() / string_count) * i + staff_border.getY();
 		appendLineWithStroke(juce::Line<float>{ staff_border.getX(), sub_line_y, staff_border.getRight(), sub_line_y });
 	}
-
 }
 
 void MainComponent::paint(juce::Graphics& g) {
-	g.fillAll(juce::Colours::black);
-	g.setColour(juce::Colours::white);
+	g.fillAll(juce::Colours::lightgrey);
+	g.setColour(juce::Colours::black);
 
 	for (auto &line_pair : lines) {
 		auto [line, stroke] = line_pair;
 		g.drawLine(line, stroke);
 	}
 
-	for (auto &svg_image : drawables) {
-		svg_image->draw(g, 1.f, {});
-	}
+	drawables[0]->drawAt(g, 64, 60, 1.f);
+	drawables[0]->drawAt(g, 64, 120, 1.f);
 }
 
 void MainComponent::resized() {

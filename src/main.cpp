@@ -1,4 +1,4 @@
-#include <main_component.h>
+#include <components/main_component.h>
 
 class GuiAppApplication final : public juce::JUCEApplication {
 public:

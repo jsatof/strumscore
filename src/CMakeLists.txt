@@ -14,10 +14,13 @@ juce_generate_juce_header(strumscore)
 target_sources(strumscore
     PRIVATE
     	main.cpp
-    	main_component.cpp)
+    	document.cpp
+    	components/main_component.cpp
+    	components/staff.cpp)
 
 target_include_directories(strumscore
     PRIVATE
+    	${JUCE_INCLUDE_DIRS}
         .)
 
 target_compile_definitions(strumscore

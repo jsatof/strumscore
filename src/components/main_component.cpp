@@ -17,17 +17,13 @@ MainComponent::MainComponent()
 	// TODO: style menubar
     addAndMakeVisible(menu_bar);
 
-    validateDirectories();
+    validateResourceDirectory();
 
     populateLines();
     populateDrawables();
 }
 
-void MainComponent::validateDirectories() {
-	if (!fs::exists(config_path)) {
-		fmt::print(stderr, "WARNING: config path doesnt exist. Creating new default config.\n");
-	}
-
+void MainComponent::validateResourceDirectory() {
 	fs::path resource_path = fs::current_path()/"res";
 	if (!fs::exists(resource_path)) {
 		fmt::print(stderr, "ERROR: Resource path not found. Make sure program launched from root project directory.\n");

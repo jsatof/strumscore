@@ -2,6 +2,7 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <filesystem>
+#include <document.h>
 
 class MainComponent final : public juce::Component {
 public:
@@ -14,7 +15,7 @@ private:
 	void populateLines();
 	void populateDrawables();
 	std::unique_ptr<juce::Drawable> loadDrawable(const std::filesystem::path &p);
-	void validateDirectories();
+	void validateResourceDirectory();
 	void appendLineWithStroke(juce::Line<float> a_line, float stroke = 0.5f);
 
 	std::vector<std::pair<juce::Line<float>, float>> lines;
@@ -24,7 +25,7 @@ private:
 	int string_count;
 
 	std::filesystem::path config_path;
-	juce::XmlDocument document;
+	StrumScore::Document document;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)

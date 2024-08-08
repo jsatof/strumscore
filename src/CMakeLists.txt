@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(strumscore VERSION 0.0.1)
 
-juce_add_plugin(strumscore
+juce_add_gui_app(strumscore
     # VERSION ...                               # Set this if the plugin version is different to the project version
     # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL ...
@@ -16,8 +16,7 @@ target_sources(strumscore
     	main.cpp
     	document.cpp
     	components/main_component.cpp
-    	components/staff.cpp
-    	util/leftpad.cpp)
+    	components/staff.cpp)
 
 target_include_directories(strumscore
     PRIVATE
@@ -39,3 +38,13 @@ target_link_libraries(strumscore
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
+
+install(TARGETS strumscore DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	add_custom_command(OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/strumscore
+		COMMAND ln -s ${CMAKE_BINARY_DIR}/src/strumscore_artefacts/Debug/strumscore ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_custom_command(OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/strumscore
+		COMMAND ln -s ${CMAKE_BINARY_DIR}/src/strumscore_artefacts/Release/strumscore ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()
+

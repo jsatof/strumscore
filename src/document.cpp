@@ -1,6 +1,7 @@
-#include <document.h>
 #include <attributes.h>
+#include <document.h>
 #include <fmt/core.h>
+#include <util/io.h>
 #include <util/leftpad.h>
 
 namespace fs = std::filesystem;
@@ -15,7 +16,7 @@ Document::Document()
 		initEmptyDocument();
 	} else {
 		fmt::print("STATUS: Found {}. Beginning to parse\n", document_path.string());
-		document_root = std::move(juce::XmlDocument::parse(juce::File{ document_path.string() }));
+		root_element = std::move(juce::XmlDocument::parse(juce::File{ document_path.string() }));
 		printState();
 	}
 }
@@ -30,7 +31,7 @@ void Document::initEmptyDocument() {
 
 	   Example structure:
 	   <root "guitarStringCount"=6>
-	     <measure "beatsPerMinute"=140 "timeSignature"="4/4" "comment"="custom message">
+	     <measure "tempo"=140 "timeSignature"="4/4" "comment"="custom message">
 			<note "duration"="quarter" "type"="played" dynamics="" articulation="fullBend" "guitarString"=3 "fret"=4></note>
 			<note "duration"="dottedEighth" "type"="played" dynamics="" articulation="vibrato" "guitarString"=3 "fret"=6></note>
 
@@ -74,19 +75,20 @@ void Document::initEmptyDocument() {
 
 	auto out_file = juce::File{ document_path.string() };
 	root.writeTo(out_file);
-	document_root = std::move(juce::XmlDocument::parse(out_file));
+	root_element = std::move(juce::XmlDocument::parse(out_file));
 }
 
 void Document::printState() {
 	using Util::leftPad;
 	fmt::println("\nSTATUS: DOCUMENT STATE");
-	std::string root_string = fmt::format("strumscoreRoot [children: {}]", document_root->getNumChildElements());
+	juce::XmlElement doc_root = getRoot(); // using the getter for testing
+	std::string root_string = fmt::format("strumscoreRoot [children: {}]", doc_root.getNumChildElements());
 	fmt::print("{}\n", leftPad(root_string, 4));
-	for (auto *element : document_root->getChildIterator()) {
+	for (auto *element : doc_root.getChildIterator()) {
 		if (element->hasTagName("measure")) {
 			std::string measure_string = fmt::format("{} [children: {}]", element->getTagName().toStdString(), element->getNumChildElements());
 			fmt::print("{}\n", leftPad(measure_string, 8));
-			for (auto *note_element : document_root->getChildByName("measure")->getChildIterator()) {
+			for (auto *note_element : doc_root.getChildByName("measure")->getChildIterator()) {
 				if (note_element->hasTagName("note")) {
 					std::string note_string = fmt::format("{}", note_element->getTagName().toStdString());
 					fmt::print("{}\n", leftPad(note_string, 12));
@@ -94,10 +96,15 @@ void Document::printState() {
 			}
 		}
 	}
+
+	fmt::print("Tempo: {}\n", getTempo());
+	auto [beat_count, beat_value] = getTimeSignature();
+	fmt::print("Time Signature: {}/{}\n", beat_count, beat_value);
 }
+
 std::pair<int, int> Document::getTimeSignature() const {
 	std::pair<int, int> time_sig = { 0, 0 };
-	for (const auto* element : document_root->getChildIterator()) {
+	for (const auto* element : root_element->getChildIterator()) {
 		if (element->hasTagName("measure")) {
 			std::string time_sig_string = element->getStringAttribute("timeSignature").toStdString();
 			time_sig.first = std::stoi(time_sig_string.substr(0, 1));
@@ -109,16 +116,25 @@ std::pair<int, int> Document::getTimeSignature() const {
 
 double Document::getTempo() const {
 	double tempo = 0.0;
-	for (const auto* element : document_root->getChildIterator()) {
-		if (element->hasTagName("measure")) {
-			tempo = element->getDoubleAttribute("tempo");
-		}
+	juce::XmlElement *element = root_element->getChildByName("measure");
+	if (element) {
+		tempo = element->getIntAttribute("tempo");
 	}
 	return tempo;
 }
 
 juce::XmlElement &Document::getRoot() const {
-	return *document_root;
+	return *root_element;
+}
+
+void Document::changeFileName(const fs::path &new_path) {
+	if (fs::exists(new_path)) {
+		fmt::print(stderr, "ERROR: new document path {} already exists.\n", new_path.string());
+		return;
+	}
+
+	root_element->writeTo(Util::convertToJuceFile(new_path));
+	document_path = new_path;
 }
 
 }

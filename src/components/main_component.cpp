@@ -24,6 +24,10 @@ MainComponent::MainComponent()
 }
 
 void MainComponent::validateResourceDirectory() {
+	if (!fs::exists(config_path)) {
+		fmt::print(stderr, "WARNING: config path doesnt exist. Creating new default config.\n");
+	}
+
 	fs::path resource_path = fs::current_path()/"res";
 	if (!fs::exists(resource_path)) {
 		fmt::print(stderr, "ERROR: Resource path not found. Make sure program launched from root project directory.\n");
@@ -127,5 +131,4 @@ void MainComponent::paint(juce::Graphics& g) {
 
 void MainComponent::resized() {
 	menu_bar.setBounds(0, 0, getWidth(), 24);
-
 }

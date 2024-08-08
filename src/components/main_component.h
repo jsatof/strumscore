@@ -27,6 +27,5 @@ private:
 	std::filesystem::path config_path;
 	Strumscore::Document document;
 
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

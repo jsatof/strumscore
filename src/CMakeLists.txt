@@ -16,7 +16,8 @@ target_sources(strumscore
     	main.cpp
     	document.cpp
     	components/main_component.cpp
-    	components/staff.cpp)
+    	components/staff.cpp
+    	util/leftpad.cpp)
 
 target_include_directories(strumscore
     PRIVATE

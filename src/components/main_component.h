@@ -25,7 +25,7 @@ private:
 	int string_count;
 
 	std::filesystem::path config_path;
-	StrumScore::Document document;
+	Strumscore::Document document;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)

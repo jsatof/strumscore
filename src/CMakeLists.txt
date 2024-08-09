@@ -32,7 +32,7 @@ target_compile_definitions(strumscore
 
 target_link_libraries(strumscore
     PRIVATE
-        juce::juce_audio_utils
+    	juce::juce_audio_utils
         fmt::fmt
     PUBLIC
         juce::juce_recommended_config_flags

@@ -10,10 +10,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wpedantic -Wextra 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -Wall -Wpedantic -Wextra -Werror -include cstdint -fdiagnostics-color=always")
 
 #set(THIRD_PARTY_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
-#include(cmake/dependencies.cmake)
-find_package(JUCE CONFIG REQUIRED)
-find_package(fmt REQUIRED)
-find_package(GTest REQUIRED)
+include(cmake/dependencies.cmake)
 
 add_subdirectory(src)
 add_subdirectory(test)

@@ -7,6 +7,7 @@ add_executable(strumscoreTest
 
 target_include_directories(strumscoreTest
     PRIVATE
+    	${PROJECT_SOURCE_DIR}/../src
         ${GTEST_SOURCE_DIR}/googletest/include
         ${JUCE_INCLUDE_DIRS})
 

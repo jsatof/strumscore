@@ -1,26 +1,28 @@
 include(cmake/cpm.cmake)
 
-#CPMAddPackage(NAME JUCE
-#    GITHUB_REPOSITORY juce-framework/JUCE
-#    GIT_TAG 7.0.11
-#    VERSION 7.0.11
-#    SOURCE_DIR ${THIRD_PARTY_LIB_DIR}/juce
-#)
+set(THIRD_PARTY_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
 
-#CPMAddPackage(NAME GTEST
-#    GITHUB_REPOSITORY google/googletest
-#    VERSION 1.14.0
-#    SOURCE_DIR ${THIRD_PARTY_LIB_DIR}/gtest
-#    OPTIONS
-#        "INSTALL_GTEST OFF"
-#        "gtest_force_shared_crt ON"
-#)
+CPMAddPackage(NAME JUCE
+    GITHUB_REPOSITORY juce-framework/JUCE
+    GIT_TAG 7.0.11
+    VERSION 7.0.11
+    SOURCE_DIR ${THIRD_PARTY_LIB_DIR}/juce
+)
 
-CPMAddPackage(NAME MAXIMILIAN
-    GITHUB_REPOSITORY micknoise/Maximilian
-    GIT_TAG 2.4
-    VERSION 2.4
-    SOURCE_DIR ${THIRD_PARTY_LIB_DIR}/Maximilian
+CPMAddPackage(NAME GTEST
+    GITHUB_REPOSITORY google/googletest
+    VERSION 1.14.0
+    SOURCE_DIR ${THIRD_PARTY_LIB_DIR}/gtest
+    OPTIONS
+        "INSTALL_GTEST OFF"
+        "gtest_force_shared_crt ON"
+)
+
+CPMAddPackage(NAME FMT
+    GITHUB_REPOSITORY fmtlib/fmt
+    GIT_TAG 11.0.2
+    VERSION 11.0.2
+    SOURCE_DIR ${THIRD_PARTY_LIB_DIR}/fmt
 )
 
 # for use with clang tidy and clang format

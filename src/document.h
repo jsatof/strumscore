@@ -16,12 +16,12 @@ public:
 	double getTempo() const;
 	juce::XmlElement &getRoot() const;
 
+	void changeFileName(const std::filesystem::path &new_path);
+
 private:
 	void initEmptyDocument();
 	void printState();
 	void writeToFile(const juce::XmlElement &root);
-
-	void changeFileName(const std::filesystem::path &new_path);
 
 	std::filesystem::path document_path;
 	std::unique_ptr<juce::XmlElement> root_element;

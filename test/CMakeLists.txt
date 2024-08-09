@@ -2,29 +2,67 @@ cmake_minimum_required(VERSION 3.22)
 project(strumscoreTest)
 enable_testing()
 
-add_executable(strumscoreTest
-    	src/audio_processor_test.cpp)
+if (MSVC)
+	add_compile_options(/Wall /WX /Werror)
+else()
+	add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+endif()
 
-target_include_directories(strumscoreTest
+# static library of sources
+add_library(strumscoreStatic
+	STATIC
+		../src/components/main_component.cpp
+		../src/document.cpp)
+
+target_include_directories(strumscoreStatic
     PRIVATE
-        ${GTEST_SOURCE_DIR}/googletest/include
-        ${JUCE_INCLUDE_DIRS})
+    	${PROJECT_SOURCE_DIR}/../src
+    	${PROJECT_SOURCE_DIR}/src
+        ${JUCE_SOURCE_DIR}/modules)
 
-target_compile_definitions(strumscore
+target_compile_definitions(strumscoreStatic
     PUBLIC
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
-        JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:strumscore,JUCE_PRODUCT_NAME>"
-        JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:strumscore,JUCE_VERSION>")
+        JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:strumscoreStatic,JUCE_PRODUCT_NAME>"
+        JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:strumscoreStatic,JUCE_VERSION>")
+
+target_link_libraries(strumscoreStatic
+    PRIVATE
+        fmt::fmt
+        GTest::gtest_main
+        juce::juce_audio_utils
+    PUBLIC
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags)
+
+install(TARGETS strumscoreStatic DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+
+# test runner
+add_executable(strumscoreTest
+    src/audio_processor_test.cpp
+    src/main_component_test.cpp)
+
+target_include_directories(strumscoreTest
+    PRIVATE
+    	${PROJECT_SOURCE_DIR}/../src
+    	${PROJECT_SOURCE_DIR}/src
+        ${JUCE_SOURCE_DIR}/modules)
+
+target_compile_definitions(strumscoreTest
+    PUBLIC
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=0
+        JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:strumscoreTest,JUCE_PRODUCT_NAME>"
+        JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:strumscoreTest,JUCE_VERSION>")
 
 target_link_libraries(strumscoreTest
     PRIVATE
-        GTest::gtest_main)
-
-target_link_libraries(strumscore
-    PRIVATE
-        juce::juce_audio_utils
         fmt::fmt
+        GTest::gtest_main
+        juce::juce_audio_utils
+        strumscoreStatic
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

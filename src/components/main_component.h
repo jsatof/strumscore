@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED
+#define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED
+#endif
+
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <filesystem>
 #include <document.h>

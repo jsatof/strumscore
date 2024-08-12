@@ -16,6 +16,8 @@ target_sources(strumscore
     	main.cpp
     	document.cpp
     	components/main_component.cpp
+    	components/menu_bar.cpp
+    	components/menu_bar_model.cpp
     	components/staff.cpp)
 
 target_include_directories(strumscore

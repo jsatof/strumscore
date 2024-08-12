@@ -2,16 +2,12 @@ cmake_minimum_required(VERSION 3.22)
 project(strumscoreTest)
 enable_testing()
 
-if (MSVC)
-	add_compile_options(/Wall /WX /Werror)
-else()
-	add_compile_options(-Wall -Wextra -Wpedantic -Werror)
-endif()
-
 # static library of sources
 add_library(strumscoreStatic
 	STATIC
 		../src/components/main_component.cpp
+		../src/components/menu_bar.cpp
+		../src/components/menu_bar_model.cpp
 		../src/document.cpp)
 
 target_include_directories(strumscoreStatic

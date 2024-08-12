@@ -4,15 +4,15 @@
 
 namespace fs = std::filesystem;
 
-MainComponent::MainComponent()
-	: string_count(6)
-	, document()
-{
-    setSize(1200, 900);
+static int main_width = 1200;
+static int main_height = 900;
 
-	// TODO: add menu items to menuModel
-    //const juce::MenuBarModel menuModel;
-	//menuBar.setModel(menuModel);
+MainComponent::MainComponent()
+	: menu_bar(main_width)
+	, document()
+	, string_count(6)
+{
+    setSize(main_width, main_height);
 
 	// TODO: style menubar
     addAndMakeVisible(menu_bar);
@@ -109,7 +109,7 @@ void MainComponent::populateLines() {
 	appendLineWithStroke(juce::Line<float>{ staff_border.getTopLeft(), staff_border.getBottomLeft() }, 15.f);
 	appendLineWithStroke(juce::Line<float>{ staff_border.getTopRight(), staff_border.getBottomRight() }, 15.f);
 
-	for (int i = 1; i < string_count; ++i) {
+	for (uint32_t i = 1; i < string_count; ++i) {
 		float sub_line_y = (staff_border.getHeight() / string_count) * i + staff_border.getY();
 		appendLineWithStroke(juce::Line<float>{ staff_border.getX(), sub_line_y, staff_border.getRight(), sub_line_y });
 	}
@@ -130,5 +130,5 @@ void MainComponent::paint(juce::Graphics& g) {
 }
 
 void MainComponent::resized() {
-	menu_bar.setBounds(0, 0, getWidth(), 24);
+	menu_bar.setBounds(0, 0, menu_bar.getWidth(), menu_bar.getHeight());
 }
